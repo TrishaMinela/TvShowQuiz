@@ -19,12 +19,21 @@ function App() {
 
   //Calling Node Backend API
   useEffect(() => {
-    fetch("http://localhost:5000/api/questions")
-      .then(res => res.json())
-      .then(data => {
-        setQuestions(data.questions)
-        setLoading(false)
+    fetch("http://127.0.0.1:5000/api/questions")
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return res.json();
       })
+      .then(data => {
+        setQuestions(data.questions);
+        setLoading(false);
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+        setLoading(false);
+      });
   }, []);
 
   const startQuiz = () => {
@@ -33,11 +42,12 @@ function App() {
     setCurrentQuestionIndex(0);
     setScore(0);
     setShowAnswer(false);
-    setSelectedOption(null);
+
   }
 
   const handleAnswer = (option) => {
-    if (option === question[currentQuestionIndex].answer) {
+    setSelectedOption(option);
+    if (option === questions[currentQuestionIndex].answer) {
       setScore(score + 1);
     }
     setShowAnswer(true);
@@ -51,68 +61,62 @@ function App() {
     } else {
       setQuizFinished(true);
     }
-  }
-
-  // Function to determine the button color
-  const getButtonClass = (option) => {
-    if (!showAnswer) return ''; // No color change if answer isn't shown
-    if (option === questions[currentQuestionIndex].answer) {
-      return 'correct'; // Correct answer
-    }
-    if (option === selectedOption) {
-      return 'incorrect'; // Selected wrong answer
-    }
-    return ''; // Default class
-  }
-
-
-  //Loading Message
-
-  //Start Quiz Button
-
-  //Show Question[]
-
-  //Show User Score
+  };
 
 
   return (
-    <div className="App">
-      {loading ? (
-        <p>Loading questions...</p>
-      ) :
-        !quizStarted || quizFinished ? (
-          <>
-            <button onClick={() => { startQuiz() }}>{quizFinished ? 'Restart' : 'Start'}</button>
-            {quizFinished && (
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 p-4">
+      <div className="bg-white shadow-lg rounded-lg p-8 max-w-md w-full">
+        {loading ? (
+          <p className="text-center">Loading questions...</p>
+        ) :
+          !quizStarted || quizFinished ? (
+            <>
+              <button
+                onClick={startQuiz}
+                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300 w-full"
+              >
+                {quizFinished ? 'Restart' : 'Start'}
+              </button>
+              {quizFinished && (
+                <div className="mt-4 text-center">
+                  <p className="text-lg">You got {score} out of {questions.length} questions right.</p>
+                </div>
+              )}
+            </>
+          ) : (
+            questions.length > 0 && currentQuestionIndex < questions.length && (
               <div>
-                <p>Your got {score} out of {questions.length} questions right.</p>
+                <h2 className="text-xl font-bold mb-4 text-center">
+                  {questions[currentQuestionIndex].question}
+                </h2>
+                <div className="grid grid-cols-2 gap-4">
+                  {questions[currentQuestionIndex].options.map((option, index) => (
+                    <button
+                      key={index}
+                      onClick={() => handleAnswer(option)}
+                      className={`px-6 py-3 rounded transition duration-300 text-black bg-white hover:bg-gray-200 
+                      ${showAnswer ?
+                          (option === questions[currentQuestionIndex].answer ? 'shadow-lg shadow-green-500' :
+                            selectedOption === option ? 'shadow-lg shadow-red-500' : '')
+                          : 'shadow-none'}
+                      w-full`}
+                    >
+                      {option}
+                    </button>
+                  ))}
+                </div>
+                {showAnswer && (
+                  <div className="mt-4 text-center">
+                    <button onClick={handleNextQuestion} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700 transition duration-300">
+                      Next
+                    </button>
+                  </div>
+                )}
               </div>
-            )}
-          </>
-        ) : (
-          <div>
-            <h2>
-              {question[currentQuestionIndex].question}
-            </h2>
-            <div>
-              {question[currentQuestionIndex].options.map((option, index) => (
-                <button
-                  key={index}
-                  onClick={() => { handleAnswer(option) }}
-                  className={getButtonClass(option)}
-                >
-                  {option}
-                </button>
-              ))}
-            </div>
-            {showAnswer && (
-              <div>
-                <p>The correct answer is: {questions[currentQuestionIndex].answer}</p>
-                <button onClick={handleNextQuestion}>Next</button>
-              </div>
-            )}
-          </div>
-        )}
+            )
+          )}
+      </div>
     </div>
   );
 }

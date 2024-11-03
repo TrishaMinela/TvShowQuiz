@@ -10,7 +10,7 @@ const PORT = 5000;
 
 //Middleware communicating to front end port 3000
 app.use(cors({
-    origin: 'http://localhost:3000'
+    origin: 'http://127.0.0.1:3000'
 }));
 
 
@@ -26,7 +26,7 @@ app.get('/api/questions', async (req, res) => {
     const messages = [
         {
             role: "system",
-            content: 'You are a quiz master of pop TV shows. Generate 10 random questions with 4 multiple choice answers. Also provide the answers separately. The response should be in the following JSON format: {"questions":[{"id":0,"question":"","options":[],"answer":""},...]}'
+            content: 'You are a pop quiz master for tv shows. Generate 10 random questions with 4 multiple choice answers. Also provide the answers separately. The response should be in the following JSON format: {"questions":[{"id":0,"question":"","options":[],"answer":""},...]}'
         }
     ];
 

@@ -12,7 +12,7 @@ function App() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [quizStarted, setQuizStarted] = useState(false);
-  const [quizFinish, setQuizFinishes] = useState(false);
+  const [quizFinished, setQuizFinished] = useState(false);
   const [loading, setLoading] = useState(true);
 
   //Calling Node Backend API
@@ -25,9 +25,30 @@ function App() {
       })
   }, []);
 
+  const startQuiz = () => {
+    setQuizStarted(true);
+    setQuizFinished(false);
+    setCurrentQuestionIndex(0);
+    setScore(0);
+  }
+
+  //Loading Message
+
+  //Start Quiz Button
+
+  //Show Question[]
+
+  //Show User Score
+
+
   return (
     <div className="App">
-
+      {loading ? (
+        <p>Loading questions...</p>
+      ) :
+        !quizStarted || quizFinished ? (
+          <button onClick={() => { startQuiz() }}>{quizFinished ? 'Restart' : 'Start'}</button>
+        )}
     </div>
   );
 }

@@ -32,6 +32,17 @@ function App() {
     setScore(0);
   }
 
+  const handleAnswer = (option) => {
+    if (option === question[currentQuestionIndex].answer) {
+      setScore(score + 1);
+    }
+    if (currentQuestionIndex < questions.length - 1) {
+      setCurrentQuestionIndex(currentQuestionIndex + 1);
+    } else {
+      setQuizFinished(true);
+    }
+  }
+
   //Loading Message
 
   //Start Quiz Button
@@ -47,7 +58,27 @@ function App() {
         <p>Loading questions...</p>
       ) :
         !quizStarted || quizFinished ? (
-          <button onClick={() => { startQuiz() }}>{quizFinished ? 'Restart' : 'Start'}</button>
+          <>
+            <button onClick={() => { startQuiz() }}>{quizFinished ? 'Restart' : 'Start'}</button>
+            {quizFinished && (
+              <div>
+                <p>Your got {score} out of {questions.length} questions right.</p>
+              </div>
+            )}
+          </>
+        ) : (
+          <div>
+            <h2>
+              {question[currentQuestionIndex].question}
+            </h2>
+            <div>
+              {question[currentQuestionIndex].options.map((option, index) => (
+                <button key={index} onClick={() => { handleAnswer(option) }}>
+                  {option}
+                </button>
+              ))}
+            </div>
+          </div>
         )}
     </div>
   );
